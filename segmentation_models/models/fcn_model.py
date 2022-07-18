@@ -7,8 +7,7 @@ from tensorflow.keras.applications.vgg16 import VGG16
 from tensorflow.keras.layers import add
 
 
-
-def fcn(image_size, ch_in=3, ch_out=1):
+def fcn_model(image_size, ch_in=3, ch_out=1):
     inputs = Input(shape=(*image_size, ch_in), name='input')
     # Building a pre-trained VGG-16 feature extractor (i.e., without the final FC layers)
     vgg16 = VGG16(include_top=False, weights='imagenet', input_tensor=inputs)
@@ -49,5 +48,5 @@ def fcn(image_size, ch_in=3, ch_out=1):
     outputs = Conv2DTranspose(filters=ch_out, kernel_size=16, strides=8,
                               padding='same', activation='sigmoid')(merge2)
 
-    fcn_model = tf.keras.Model(inputs, outputs)
-    return fcn_model
+    fcn = tf.keras.Model(inputs, outputs)
+    return fcn
