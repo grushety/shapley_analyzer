@@ -1,5 +1,8 @@
 import math
-from shapley_analyzer.prepare_input_data import code_features, find_all_feature_combination, calculate_margins_for_features, \
+import numpy as np
+import tensorflow as tf
+from shapley_analyzer.prepare_input_data import code_features, find_all_feature_combination, \
+    calculate_margins_for_features, \
     noise_channels, decode_accuracy_map
 
 
@@ -19,7 +22,11 @@ def calculate_shapely(channel_name, channel_map):
     return shapely_value
 
 
-def calculate_shapely_for_model(feature_names, data, labels, model):
+def calculate_shapely_for_model(feature_names, data, labels, model, feature_type='none'):
+
+    if feature_type == 'image':
+        labels = tf.cast(labels / 255, tf.float32)
+
     # step 1: encode features/channels with alphabet letters
     feature_coding_map = code_features(feature_names)
     feature_codes = feature_coding_map.keys()
@@ -33,10 +40,14 @@ def calculate_shapely_for_model(feature_names, data, labels, model):
     # step 4: evaluate model for each clean combination of channels
     accuracy_map = {}
     for combination in all_features:
-        noized_input = noise_channels(data, combination, all_features, feature_codes, margins)
-        loss, accuracy = model.evaluate(noized_input, labels, batch_size=10)
+        noised_input = noise_channels(data, combination, all_features, feature_codes, margins, feature_type=feature_type)
+        if feature_type == 'image':
+            noised_input = noised_input / 255
+            noised_input = tf.cast(noised_input, tf.float32)
+        loss, accuracy = model.evaluate(noised_input, labels, batch_size=10)
         accuracy_map[combination] = accuracy
-        # for nice representation
+
+    # for nice representation
     accuracy_decoded_map = decode_accuracy_map(accuracy_map, feature_coding_map)
 
     # step 5: calculate shapely value for each channel

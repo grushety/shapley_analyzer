@@ -49,7 +49,6 @@ def unet_model():
     c9 = Conv2D(16, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same')(u9)
     c9 = Dropout(0.1)(c9)
     c9 = Conv2D(16, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same')(c9)
-    outputs = Conv2D(1, (1, 1), activation='softmax')(c9)
-    outputs[outputs > 0] = 1
+    outputs = Conv2D(1, (1, 1), activation='sigmoid')(c9)
     model = tf.keras.Model(inputs=[inputs], outputs=[outputs])
     return model

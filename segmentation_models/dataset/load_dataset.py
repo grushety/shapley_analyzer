@@ -1,46 +1,51 @@
 import inspect
-import zipfile
-
-import gdown
 import os
-from google_drive_downloader import GoogleDriveDownloader as gdd
-import os
-import wget
 
-from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
-import io
-import re
+import numpy as np
+import tensorflow as tf
 
-# all files end with "?usp=sharing" or "/view?usp=sharing"
-DRIVE_LINK_FOLDER = 'https://drive.google.com/drive/folders/1u3To4nXF1fLoQD8cNtGHVLNZmK2pa4_f'
-TRAIN_ID = '1C6IaJ1AVDFOtgWChm4-mNSC7ue8NDVTu'
-TEST_ID = '1C5LuAjr2G1us-zXye47DzBUR3_0KPjUJ'
-VALIDATE_10_ID = '13DHiDsINxtVW2uq0i-mR3MktzimiRMp4'
-VALIDATE_100_ID = '1Yq5L78lmW_6cSfOnL7h3Ie6jYowKRC8L'
-#https://drive.google.com/file/d/1C5LuAjr2G1us-zXye47DzBUR3_0KPjUJ/view?usp=sharing
-IDS = [TRAIN_ID, TEST_ID, VALIDATE_10_ID, VALIDATE_100_ID]
-NAMES = ['train', 'test', 'validate_10', 'validate_100']
-PATH = os.path.join(os.path.dirname(os.path.abspath(inspect.stack()[0][1])), 'data')
+PATH = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))
 
 
-def download_file(file_index, file_name):
-    path = os.path.join(PATH, file_name + '.zip')
-    #gdd.download_file_from_google_drive(file_id=IDS[file_index], dest_path=path, unzip=True)
-    wget.download("https://drive.google.com/file/d/1C5LuAjr2G1us-zXye47DzBUR3_0KPjUJ", out=path)
-    #unzip_file(path)
+def load_dataset_for_training():
+    path_train_original = os.path.join(PATH, 'data', 'train_original.npy')
+    path_train_labeled = os.path.join(PATH, 'data', 'train_labeled.npy')
 
+    train_original = np.load(path_train_original)
+    train_labeled = np.load(path_train_labeled)
+    train_dataset = tf.data.Dataset.from_tensor_slices(
+        (tf.cast(train_original, tf.uint8) / 255, tf.cast(train_labeled, tf.uint8) / 255))
 
+    path_test_original = os.path.join(PATH, 'data', 'test_original.npy')
+    path_test_labeled = os.path.join(PATH, 'data', 'test_labeled.npy')
 
-def unzip_file(path_to_zip_file):
-    with zipfile.ZipFile(path_to_zip_file, 'r') as zip_ref:
-        zip_ref.extractall(PATH)
-
-
-def download_all_data():
-    for i in range(len(IDS)):
-        download_file(i, NAMES[i])
-
-
-def create_dataset():
-    train_dataset, test_dataset = [], []
+    test_original = np.load(path_test_original)
+    test_labeled = np.load(path_test_labeled)
+    test_dataset = tf.data.Dataset.from_tensor_slices(
+        (tf.cast(test_original, tf.uint8) / 255, tf.cast(test_labeled, tf.uint8) / 255))
     return train_dataset, test_dataset
+
+
+def load_test_files():
+    path_test_original = os.path.join(PATH, 'data', 'test_original.npy')
+    path_test_labeled = os.path.join(PATH, 'data', 'test_labeled.npy')
+    test_original = np.load(path_test_original)
+    test_labeled = np.load(path_test_labeled)
+    return test_original, test_labeled
+
+
+def load_10_validation_files():
+    path_validated_original = os.path.join(PATH, 'data', 'validate_original_10.npy')
+    path_validated_labeled = os.path.join(PATH, 'data', 'validate_labeled_10.npy')
+    x_validate = np.load(path_validated_original)
+    y_validate = np.load(path_validated_labeled)
+    return x_validate, y_validate
+
+
+def load_100_validation_files():
+    path_validated_original = os.path.join(PATH, 'data', 'validate_original_100.npy')
+    path_validated_labeled = os.path.join(PATH, 'data', 'validate_labeled_100.npy')
+    print(path_validated_original)
+    x_validate = np.load(path_validated_original)
+    y_validate = np.load(path_validated_labeled)
+    return x_validate, y_validate
