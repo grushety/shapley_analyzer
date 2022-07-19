@@ -1,5 +1,4 @@
 import math
-import numpy as np
 import tensorflow as tf
 from shapley_analyzer.prepare_input_data import code_features, find_all_feature_combination, \
     calculate_margins_for_features, \
@@ -23,7 +22,6 @@ def calculate_shapely(channel_name, channel_map):
 
 
 def calculate_shapely_for_model(feature_names, data, labels, model, feature_type='none'):
-
     if feature_type == 'image':
         labels = tf.cast(labels / 255, tf.float32)
 
@@ -40,7 +38,8 @@ def calculate_shapely_for_model(feature_names, data, labels, model, feature_type
     # step 4: evaluate model for each clean combination of channels
     accuracy_map = {}
     for combination in all_features:
-        noised_input = noise_channels(data, combination, all_features, feature_codes, margins, feature_type=feature_type)
+        noised_input = noise_channels(data, combination, all_features, feature_codes, margins,
+                                      feature_type=feature_type)
         if feature_type == 'image':
             noised_input = noised_input / 255
             noised_input = tf.cast(noised_input, tf.float32)

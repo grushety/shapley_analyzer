@@ -22,7 +22,7 @@ def noise_channels(input, features, all_features, feature_codes, margins, featur
             for item in noised_input:
                 if feature_type != 'image':
                     item[feature[0]] = random.uniform(margins[feature[1]]['min'], margins[feature[1]]['max'])
-                else: # if a data is 3 dim image
+                else:  # if a data is 3 dim image
                     for line in item:
                         for pixel in line:
                             pixel[feature[0]] = random.uniform(margins[feature[1]]['min'], margins[feature[1]]['max'])
