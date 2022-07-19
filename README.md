@@ -5,3 +5,6 @@ The goal of this study project was to build and train a model that classifies fl
 and to estimate the contribution of each input feature (individual bands of the remote sensing images) to the classification result
 through calculating the Shapley Value for each input feature.
 
+We have tried to implement a simple library to calculate shapely values, noisy the data and checked how valuable each feature's impact is.
+
+
