@@ -2,10 +2,15 @@ import tensorflow as tf
 from tensorflow.keras.optimizers import Adam
 from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 
-from loss_functions import dice_coef_loss, tversky_loss
+from segmentation_models.training.loss_functions import dice_coef_loss, tversky_loss
 from segmentation_models.dataset.load_dataset import load_dataset_for_training
 from segmentation_models.models.fcn_model import fcn_model
 from segmentation_models.models.unet_model import unet_model
+
+import os
+import inspect
+
+PATH = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))
 
 
 def train_net(num_epochs=10, batch_size=64, val_subsplits=5, net_model='unet', net_name='unet_dice', loss_type='dice'):
@@ -27,7 +32,7 @@ def train_net(num_epochs=10, batch_size=64, val_subsplits=5, net_model='unet', n
             net_model = unet_model()
         else:
             net_model = fcn_model((256, 256))
-        if loss_type=='dice':
+        if loss_type == 'dice':
             loss_function = [dice_coef_loss]
         else:
             loss_function = [tversky_loss]
@@ -40,5 +45,6 @@ def train_net(num_epochs=10, batch_size=64, val_subsplits=5, net_model='unet', n
                               validation_steps=validation_steps,
                               validation_data=test_batches,
                               callbacks=callbacks)
-
-        model.save('trained_model/' + net_name + '.h5')
+        path = os.path.join(PATH, 'models', net_name + '.h5')
+        model.save(path)
+        return model
