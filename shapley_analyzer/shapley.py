@@ -1,11 +1,11 @@
 import math
 import tensorflow as tf
-from shapley_analyzer.prepare_input_data import code_features, find_all_feature_combination, \
+from prepare_input_data import code_features, find_all_feature_combination, \
     calculate_margins_for_features, \
     noise_channels, decode_accuracy_map
 
 
-def calculate_shapely(channel_name, channel_map):
+def calculate_shapley(channel_name, channel_map):
     map_keys = channel_map.keys()
     number_of_channels = sum(len(x) == 1 for x in map_keys)
     channels_without_selected = [x for x in map_keys if all(y not in x for y in channel_name)]
@@ -21,7 +21,7 @@ def calculate_shapely(channel_name, channel_map):
     return shapely_value
 
 
-def calculate_shapely_for_model(feature_names, data, labels, model, feature_type='none'):
+def calculate_shapley_for_model(feature_names, data, labels, model, feature_type='none'):
     if feature_type == 'image':
         labels = tf.cast(labels / 255, tf.float32)
 
