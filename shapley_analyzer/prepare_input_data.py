@@ -4,7 +4,6 @@ import itertools
 
 import numpy as np
 
-
 def calculate_margins_for_features(feature_codes, input):
     margins = {}
     for feature_code in enumerate(feature_codes):
